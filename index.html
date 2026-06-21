@@ -160,15 +160,25 @@
     .conn-line.anim { animation: dashFlow 1.8s linear infinite; }
     @keyframes dashFlow { to { stroke-dashoffset: -18; } }
 
-    /* ─── Hotspot labels ─────────────────────────────────────────── */
+    /* ─── Hotspot labels — fixed screen positions ───────────────── */
     .hs-label {
       position: fixed; z-index: 30;
       cursor: pointer; user-select: none;
-      transition: opacity 0.25s;
+      transition: opacity 0.3s;
     }
+    /* Left-side labels: pin on the right so line exits rightward */
+    #hs-0 { left: 32px; top: 26%; }
+    #hs-1 { left: 32px; top: 44%; }
+    #hs-3 { left: 32px; top: 62%; }
+    /* Right-side label: pin on the left so line exits leftward */
+    #hs-2 { right: 32px; top: 50%; }
+
     .hs-label-row {
       display: flex; align-items: center; gap: 8px;
     }
+    /* Right-side label flips the order so pin is on the left */
+    #hs-2 .hs-label-row { flex-direction: row-reverse; }
+
     .hs-pin {
       width: 9px; height: 9px; border-radius: 50%;
       background: var(--cyan);
@@ -296,16 +306,16 @@
 </svg>
 
 <!-- ── Hotspot labels ─────────────────────────────────────────────── -->
-<div class="hs-label" id="hs-0" style="display:none">
+<div class="hs-label" id="hs-0">
   <div class="hs-label-row"><div class="hs-pin"></div><div class="hs-chip">① ECG Electrodes</div></div>
 </div>
-<div class="hs-label" id="hs-1" style="display:none">
+<div class="hs-label" id="hs-1">
   <div class="hs-label-row"><div class="hs-pin"></div><div class="hs-chip">② Data Tracks</div></div>
 </div>
-<div class="hs-label" id="hs-2" style="display:none">
+<div class="hs-label" id="hs-2">
   <div class="hs-label-row"><div class="hs-pin"></div><div class="hs-chip">③ Wrist Display</div></div>
 </div>
-<div class="hs-label" id="hs-3" style="display:none">
+<div class="hs-label" id="hs-3">
   <div class="hs-label-row"><div class="hs-pin"></div><div class="hs-chip">④ Brain Pod</div></div>
 </div>
 
@@ -374,7 +384,6 @@ const HOTSPOTS = [
   {
     id: 0,
     pos3d: [0.02, 0.68, 0.67],
-    labelOffset: [-180, -14],   // px offset: left-offset labels
     zone: 'Chest Zone', numLabel: '01',
     title: 'Medical-Grade ECG Electrodes',
     body: 'Silver-plated conductive yarns are woven directly into the front chest panel, maintaining skin contact during activity. The on-board processor delivers clinical Lead I ECG quality at ±2 bpm — no gel, no strap.',
@@ -383,7 +392,6 @@ const HOTSPOTS = [
   {
     id: 1,
     pos3d: [-1.36, 0.22, 0.08],
-    labelOffset: [-200, -14],
     zone: 'Sleeve Seams', numLabel: '02',
     title: 'Serpentine Data Tracks',
     body: 'Stretchable silver-ink traces printed in an S-curve pattern route both data and power from the chest ECG array to the wrist display. The serpentine geometry tolerates 40% elongation without resistance change.',
@@ -392,7 +400,6 @@ const HOTSPOTS = [
   {
     id: 2,
     pos3d: [1.58, -0.58, 0.08],
-    labelOffset: [18, -14],
     zone: 'Wrist Cuff', numLabel: '03',
     title: 'Stealth Fiber Optic Display',
     body: 'A 16×8 micro-LED matrix behind a polymer diffuser is completely invisible at rest. A wrist-flick gesture activates the monochrome readout showing heart rate, skin temperature and UV dose. Average on-time: 2.4 seconds.',
@@ -401,7 +408,6 @@ const HOTSPOTS = [
   {
     id: 3,
     pos3d: [0.0, -1.18, 0.40],
-    labelOffset: [-100, 24],
     zone: 'Waistband', numLabel: '04',
     title: 'Modular Brain Pod',
     body: 'A 3 mm silicone capsule containing the ARM Cortex-M33 MCU, BLE 5.3 radio, and 220 mAh solid-state battery. Snaps magnetically onto pogo contacts. Detaches in under a second before the shirt goes in the wash.',
@@ -616,22 +622,24 @@ function project(pos3d) {
 
 function updateLabels() {
   HOTSPOTS.forEach((hs, i) => {
-    const { x, y, behind } = project(hs.pos3d);
+    const { x: dotX, y: dotY, behind } = project(hs.pos3d);
     const label = hsLabels[i];
     const conn  = connEls[i];
-    if (behind) { label.style.display = 'none'; conn.style.display = 'none'; return; }
-    label.style.display = '';
-    conn.style.display  = '';
-    const lx = x + hs.labelOffset[0];
-    const ly = y + hs.labelOffset[1];
-    label.style.left = lx + 'px';
-    label.style.top  = ly + 'px';
-    // Connector: from 3D-projected dot → label pin dot
-    const pin = label.querySelector('.hs-pin');
-    const pinX = lx + pin.offsetWidth / 2;
-    const pinY = ly + pin.offsetHeight / 2;
-    conn.setAttribute('x1', x);  conn.setAttribute('y1', y);
-    conn.setAttribute('x2', pinX); conn.setAttribute('y2', pinY);
+
+    // Dim label when hotspot is on the back of the shirt
+    label.style.opacity = behind ? '0.25' : '1';
+
+    // Connector line: from pin (fixed label side) → projected 3D dot
+    const rect = label.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    // Left-side labels anchor from right edge; right-side from left edge
+    const isRight = hs.id === 2;
+    const anchorX = isRight ? rect.left : rect.right;
+
+    conn.setAttribute('x1', anchorX);
+    conn.setAttribute('y1', midY);
+    conn.setAttribute('x2', dotX);
+    conn.setAttribute('y2', dotY);
   });
 }
 
