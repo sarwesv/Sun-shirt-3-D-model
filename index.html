@@ -3,1903 +3,717 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IBWS — Integrated Bio-Thermal Wearable System</title>
+  <title>IBWS — Smart Sun Shirt</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
   <style>
-    /* ─── Reset & Base ───────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0B0F19;
-      --bg-2: #111827;
-      --bg-3: #1A2236;
       --cyan: #00F0FF;
-      --cyan-dim: rgba(0,240,255,0.12);
-      --cyan-glow: rgba(0,240,255,0.35);
-      --white: #F0F4FF;
+      --cyan-dim: rgba(0,240,255,0.1);
+      --bg: #0B0F19;
+      --white: #EEF3FF;
       --muted: #6B7A99;
       --border: rgba(255,255,255,0.07);
-      --font-head: 'Space Grotesk', sans-serif;
-      --font-body: 'Inter', sans-serif;
-      --font-mono: 'Roboto Mono', monospace;
-      --radius: 12px;
-      --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      --mono: 'Roboto Mono', monospace;
+      --head: 'Space Grotesk', sans-serif;
+      --body: 'Inter', sans-serif;
     }
 
-    html { scroll-behavior: smooth; }
-
-    body {
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
       background: var(--bg);
       color: var(--white);
-      font-family: var(--font-body);
-      font-size: 16px;
-      line-height: 1.6;
-      overflow-x: hidden;
-      transition: background var(--transition), color var(--transition);
+      font-family: var(--body);
     }
 
-    /* Stealth Mode overrides */
-    body.stealth {
-      --bg: #04060D;
-      --bg-2: #080C14;
-      --bg-3: #0C1020;
-      --border: rgba(0,240,255,0.12);
-    }
-
-    /* ─── Scrollbar ──────────────────────────────────────────────────── */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--cyan-glow); border-radius: 2px; }
-
-    /* ─── Utility ────────────────────────────────────────────────────── */
-    .container { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
-    .tag {
-      display: inline-block;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--cyan);
-      background: var(--cyan-dim);
-      border: 1px solid rgba(0,240,255,0.25);
-      border-radius: 4px;
-      padding: 4px 10px;
-      margin-bottom: 20px;
-    }
-    .section-label {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 14px;
-    }
-    h2.section-title {
-      font-family: var(--font-head);
-      font-size: clamp(1.8rem, 4vw, 2.8rem);
-      font-weight: 700;
-      line-height: 1.15;
-      margin-bottom: 16px;
-    }
-    .cyan { color: var(--cyan); }
-
-    /* ─── Nav ────────────────────────────────────────────────────────── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      padding: 18px 0;
-      background: rgba(11,15,25,0.85);
-      backdrop-filter: blur(18px);
-      border-bottom: 1px solid var(--border);
-      transition: background var(--transition), border-color var(--transition);
-    }
-    body.stealth nav { background: rgba(4,6,13,0.92); }
-    .nav-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .logo {
-      font-family: var(--font-mono);
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--cyan);
-      letter-spacing: 0.1em;
-      text-decoration: none;
-    }
-    .logo span { color: var(--white); }
-    .nav-links {
-      display: flex;
-      gap: 32px;
-      list-style: none;
-    }
-    .nav-links a {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--muted);
-      text-decoration: none;
-      letter-spacing: 0.02em;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--white); }
-    .btn-stealth {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--bg);
-      background: var(--cyan);
-      border: none;
-      border-radius: 6px;
-      padding: 9px 18px;
-      cursor: pointer;
-      transition: opacity 0.2s, box-shadow 0.2s;
-    }
-    .btn-stealth:hover { opacity: 0.88; box-shadow: 0 0 20px var(--cyan-glow); }
-    body.stealth .btn-stealth { background: var(--bg-3); color: var(--cyan); border: 1px solid var(--cyan-glow); }
-
-    /* ─── Hero 3D Canvas ────────────────────────────────────────────── */
-    #hero {
-      position: relative;
-      width: 100%;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* Stealth grid overlay */
-    #hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(0,240,255,0.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,240,255,0.045) 1px, transparent 1px);
-      background-size: 48px 48px;
-      opacity: 0;
-      transition: opacity 0.7s;
-      pointer-events: none;
-      z-index: 1;
-    }
-    body.stealth #hero::before { opacity: 1; }
-
+    /* ─── Canvas ────────────────────────────────────────────────── */
     #canvas3d {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
+      position: fixed; inset: 0;
+      width: 100%; height: 100%;
       display: block;
       cursor: grab;
     }
     #canvas3d:active { cursor: grabbing; }
 
-    /* Text overlay — bottom-left corner */
-    #hero-overlay {
-      position: absolute;
-      bottom: 72px;
-      left: 52px;
-      max-width: 440px;
-      z-index: 5;
+    /* Stealth grid */
+    #grid-overlay {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,240,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,240,255,0.04) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.7s;
+      z-index: 1;
     }
+    body.stealth #grid-overlay { opacity: 1; }
 
-    .hero-tag {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--cyan);
-      background: rgba(0,240,255,0.1);
-      border: 1px solid rgba(0,240,255,0.22);
-      border-radius: 4px;
-      padding: 4px 10px;
-      display: inline-block;
-      margin-bottom: 14px;
+    /* ─── Nav ───────────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 40px;
+      background: rgba(11,15,25,0.72);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
     }
-
-    h1 {
-      font-family: var(--font-head);
-      font-size: clamp(1.7rem, 3.8vw, 3rem);
-      font-weight: 700;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      margin-bottom: 20px;
-      text-shadow: 0 2px 24px rgba(0,0,0,0.9);
+    .logo {
+      font-family: var(--mono); font-size: 13px;
+      color: var(--cyan); letter-spacing: 0.1em;
     }
-
-    /* Paragraph cycling block */
-    #para-block {
-      min-height: 84px;
-      margin-bottom: 10px;
-      transition: opacity 0.5s ease;
-    }
-    .para-line {
-      font-size: 13.5px;
+    .logo span { color: var(--white); }
+    .nav-center {
+      font-family: var(--mono); font-size: 9.5px;
+      letter-spacing: 0.22em; text-transform: uppercase;
       color: var(--muted);
-      line-height: 1.72;
     }
-    .para-line + .para-line { margin-top: 10px; }
+    .btn-stealth {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--bg); background: var(--cyan);
+      border: none; border-radius: 5px;
+      padding: 8px 16px; cursor: pointer;
+      transition: opacity 0.2s, box-shadow 0.2s;
+    }
+    .btn-stealth:hover { opacity: 0.85; box-shadow: 0 0 22px rgba(0,240,255,0.45); }
+    body.stealth .btn-stealth {
+      background: transparent; color: var(--cyan);
+      border: 1px solid rgba(0,240,255,0.4);
+    }
 
-    /* Dot indicators */
+    /* ─── Title — top left ──────────────────────────────────────── */
+    #hero-title {
+      position: fixed; top: 84px; left: 44px;
+      z-index: 40; max-width: 400px;
+    }
+    .badge {
+      font-family: var(--mono); font-size: 9px;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--cyan); background: var(--cyan-dim);
+      border: 1px solid rgba(0,240,255,0.22);
+      border-radius: 3px; padding: 3px 9px;
+      display: inline-block; margin-bottom: 12px;
+    }
+    #hero-title h1 {
+      font-family: var(--head);
+      font-size: clamp(1.5rem, 2.8vw, 2.4rem);
+      font-weight: 700; line-height: 1.12;
+      letter-spacing: -0.02em;
+      text-shadow: 0 2px 24px rgba(0,0,0,0.85);
+    }
+    #hero-title h1 em { color: var(--cyan); font-style: normal; }
+
+    /* ─── Para block — bottom left ──────────────────────────────── */
+    #para-area {
+      position: fixed; bottom: 52px; left: 44px;
+      z-index: 40; max-width: 360px;
+    }
     .para-dots {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 20px;
+      display: flex; gap: 6px; margin-bottom: 12px;
     }
     .para-dot {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.2);
-      transition: background 0.35s, transform 0.35s;
+      width: 4px; height: 4px; border-radius: 50%;
+      background: rgba(255,255,255,0.18);
       cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
     }
-    .para-dot.active { background: var(--cyan); transform: scale(1.4); }
+    .para-dot.on { background: var(--cyan); transform: scale(1.55); }
+    #para-copy {
+      font-size: 12.5px; color: var(--muted);
+      line-height: 1.78;
+    }
+    #para-copy p + p { margin-top: 8px; }
 
-    .hero-actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
+    /* ─── Spec strip — bottom right ─────────────────────────────── */
+    #spec-strip {
+      position: fixed; bottom: 44px; right: 44px;
+      z-index: 40;
+      display: flex; flex-direction: column;
+      gap: 10px; align-items: flex-end;
     }
-    .btn-primary {
-      font-family: var(--font-head);
-      font-size: 13px;
-      font-weight: 600;
-      color: #0B0F19;
+    .spec-row { display: flex; align-items: center; gap: 10px; }
+    .spec-val {
+      font-family: var(--mono); font-size: 13px;
+      font-weight: 500; color: var(--cyan);
+    }
+    .spec-lbl { font-size: 11px; color: var(--muted); }
+
+    /* ─── SVG connector lines ────────────────────────────────────── */
+    #conn-svg {
+      position: fixed; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 20;
+      overflow: visible;
+    }
+    .conn-line {
+      stroke: rgba(0,240,255,0.32);
+      stroke-width: 1;
+      fill: none;
+      stroke-dasharray: 5 4;
+    }
+    .conn-line.anim { animation: dashFlow 1.8s linear infinite; }
+    @keyframes dashFlow { to { stroke-dashoffset: -18; } }
+
+    /* ─── Hotspot labels ─────────────────────────────────────────── */
+    .hs-label {
+      position: fixed; z-index: 30;
+      cursor: pointer; user-select: none;
+      transition: opacity 0.25s;
+    }
+    .hs-label-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .hs-pin {
+      width: 9px; height: 9px; border-radius: 50%;
       background: var(--cyan);
-      border: none;
-      border-radius: var(--radius);
-      padding: 12px 24px;
-      cursor: pointer;
-      transition: box-shadow 0.25s, transform 0.15s;
+      box-shadow: 0 0 0 3px rgba(0,240,255,0.2), 0 0 14px rgba(0,240,255,0.7);
+      flex-shrink: 0;
+      animation: pinPulse 2.6s ease-in-out infinite;
     }
-    .btn-primary:hover { box-shadow: 0 0 28px var(--cyan-glow); transform: translateY(-2px); }
-    .btn-outline {
-      font-family: var(--font-head);
-      font-size: 13px;
-      font-weight: 600;
+    @keyframes pinPulse {
+      0%,100% { box-shadow: 0 0 0 3px rgba(0,240,255,0.18), 0 0 12px rgba(0,240,255,0.55); }
+      50%      { box-shadow: 0 0 0 7px rgba(0,240,255,0.04), 0 0 22px rgba(0,240,255,0.25); }
+    }
+    .hs-chip {
+      font-family: var(--mono); font-size: 9px;
+      letter-spacing: 0.1em; text-transform: uppercase;
       color: var(--white);
-      background: transparent;
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: var(--radius);
-      padding: 12px 24px;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      text-decoration: none;
-      display: inline-block;
+      background: rgba(11,15,25,0.82);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0,240,255,0.22);
+      border-radius: 4px; padding: 4px 9px;
+      white-space: nowrap;
+      transition: border-color 0.2s, color 0.2s;
     }
-    .btn-outline:hover { border-color: var(--cyan); background: var(--cyan-dim); }
+    .hs-label:hover .hs-chip { border-color: var(--cyan); color: var(--cyan); }
 
-    /* Drag hint */
-    .drag-hint {
-      position: absolute;
-      top: 90px; right: 36px;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--muted);
-      letter-spacing: 0.13em;
-      text-transform: uppercase;
-      z-index: 5;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      opacity: 0;
-      animation: fadeInUp 1s 2.2s both;
+    /* ─── Rotate hint ────────────────────────────────────────────── */
+    #rotate-hint {
+      position: fixed; top: 50%; right: 38px;
+      transform: translateY(-50%);
+      z-index: 40;
+      font-family: var(--mono); font-size: 9px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(107,122,153,0.4);
+      writing-mode: vertical-rl;
+      pointer-events: none;
     }
 
-    /* Scroll hint */
-    .scroll-hint {
-      position: absolute;
-      bottom: 28px; left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.16em;
-      color: var(--muted);
-      text-transform: uppercase;
-      z-index: 5;
-      animation: fadeInUp 1s 1.8s both;
+    /* ─── Info panel ─────────────────────────────────────────────── */
+    #info-panel {
+      position: fixed; top: 0; right: 0;
+      width: min(360px, 90vw); height: 100%;
+      background: rgba(9,13,22,0.97);
+      backdrop-filter: blur(24px);
+      border-left: 1px solid rgba(0,240,255,0.12);
+      z-index: 80;
+      padding: 96px 32px 40px;
+      display: flex; flex-direction: column; gap: 18px;
+      will-change: transform;
     }
-    .scroll-line {
-      width: 1px;
-      height: 36px;
-      background: linear-gradient(to bottom, var(--cyan), transparent);
-      animation: scrollLine 2s ease-in-out infinite;
+    .panel-close {
+      position: absolute; top: 20px; right: 20px;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: none; cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted); font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, color 0.2s;
     }
-    @keyframes scrollLine {
-      0%    { transform: scaleY(0); transform-origin: top; }
-      50%   { transform: scaleY(1); transform-origin: top; }
-      50.01%{ transform-origin: bottom; }
-      100%  { transform: scaleY(0); transform-origin: bottom; }
+    .panel-close:hover { border-color: var(--cyan); color: var(--cyan); }
+    #p-num {
+      font-family: var(--mono); font-size: 32px;
+      font-weight: 500; color: rgba(0,240,255,0.12);
+      line-height: 1; letter-spacing: -0.02em;
+    }
+    #p-zone {
+      font-family: var(--mono); font-size: 9px;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--cyan); margin-top: -8px;
+    }
+    #p-title {
+      font-family: var(--head); font-size: 1.35rem;
+      font-weight: 700; line-height: 1.18; color: var(--white);
+    }
+    .panel-divider {
+      width: 32px; height: 1px;
+      background: var(--cyan); opacity: 0.4;
+    }
+    #p-body {
+      font-size: 13px; color: var(--muted);
+      line-height: 1.78;
+    }
+    #p-pills {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-top: 4px;
+    }
+    .ppill {
+      font-family: var(--mono); font-size: 9px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--cyan);
+      background: rgba(0,240,255,0.07);
+      border: 1px solid rgba(0,240,255,0.18);
+      border-radius: 20px; padding: 3px 10px;
+    }
+    .panel-hint {
+      font-family: var(--mono); font-size: 10px;
+      color: var(--muted); letter-spacing: 0.06em;
+      margin-top: auto; padding-top: 24px;
+      border-top: 1px solid var(--border);
     }
 
+    /* ─── Mobile ─────────────────────────────────────────────────── */
     @media (max-width: 640px) {
-      #hero-overlay { left: 20px; right: 20px; bottom: 56px; max-width: none; }
-      h1 { font-size: 1.55rem; }
-      .drag-hint { display: none; }
-    }
-
-    /* ─── Stats bar ──────────────────────────────────────────────────── */
-    .stats-bar {
-      background: var(--bg-2);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 28px 0;
-      transition: background var(--transition), border-color var(--transition);
-    }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0;
-    }
-    .stat-item {
-      text-align: center;
-      padding: 0 16px;
-      border-right: 1px solid var(--border);
-    }
-    .stat-item:last-child { border-right: none; }
-    .stat-num {
-      font-family: var(--font-mono);
-      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
-      font-weight: 500;
-      color: var(--cyan);
-      display: block;
-      line-height: 1.1;
-      margin-bottom: 4px;
-    }
-    .stat-label {
-      font-size: 12px;
-      color: var(--muted);
-      letter-spacing: 0.04em;
-    }
-
-    /* ─── How It Works ───────────────────────────────────────────────── */
-    #how-it-works {
-      padding: 120px 0;
-      background: var(--bg);
-      transition: background var(--transition);
-    }
-    .how-inner {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
-      align-items: start;
-    }
-    .how-left { position: sticky; top: 100px; }
-    .how-desc {
-      font-size: 16px;
-      color: var(--muted);
-      line-height: 1.75;
-      margin-bottom: 32px;
-    }
-
-    /* Blueprint shirt with hotspots */
-    .blueprint-stage {
-      position: relative;
-      width: 100%;
-      max-width: 380px;
-      margin: 0 auto;
-    }
-    .blueprint-svg {
-      width: 100%;
-      height: auto;
-    }
-
-    /* Hotspot dots */
-    .hotspot {
-      position: absolute;
-      width: 14px;
-      height: 14px;
-      cursor: pointer;
-      z-index: 5;
-    }
-    .hotspot-ring {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: var(--cyan);
-      border: 2px solid var(--bg);
-      box-shadow: 0 0 0 4px var(--cyan-glow);
-      animation: pulse 2.5s ease-in-out infinite;
-      transition: box-shadow 0.2s;
-    }
-    .hotspot:hover .hotspot-ring,
-    .hotspot.active .hotspot-ring {
-      box-shadow: 0 0 0 6px rgba(0,240,255,0.45);
-    }
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 4px rgba(0,240,255,0.3); }
-      50% { box-shadow: 0 0 0 8px rgba(0,240,255,0.08); }
-    }
-
-    /* Tooltip card */
-    .hotspot-tooltip {
-      position: absolute;
-      background: var(--bg-3);
-      border: 1px solid rgba(0,240,255,0.25);
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      width: 220px;
-      pointer-events: none;
-      opacity: 0;
-      transform: translateY(6px) scale(0.97);
-      transition: opacity 0.22s, transform 0.22s;
-      z-index: 10;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    }
-    .hotspot:hover .hotspot-tooltip,
-    .hotspot.active .hotspot-tooltip { opacity: 1; transform: translateY(0) scale(1); }
-    .tooltip-zone {
-      font-family: var(--font-mono);
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--cyan);
-      margin-bottom: 4px;
-    }
-    .tooltip-title {
-      font-family: var(--font-head);
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--white);
-      margin-bottom: 6px;
-    }
-    .tooltip-desc {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.55;
-    }
-
-    /* Panel cards on right */
-    .panel-list { display: flex; flex-direction: column; gap: 16px; }
-    .panel-card {
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 22px 24px;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s, transform 0.15s;
-      position: relative;
-      overflow: hidden;
-    }
-    .panel-card::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: var(--cyan);
-      transform: scaleY(0);
-      transform-origin: bottom;
-      transition: transform 0.3s;
-    }
-    .panel-card.active,
-    .panel-card:hover { border-color: rgba(0,240,255,0.3); background: var(--bg-3); transform: translateX(4px); }
-    .panel-card.active::before { transform: scaleY(1); }
-    .panel-card-head {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-    .panel-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background: var(--cyan-dim);
-      border: 1px solid rgba(0,240,255,0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 16px;
-    }
-    .panel-card-title {
-      font-family: var(--font-head);
-      font-size: 15px;
-      font-weight: 600;
-    }
-    .panel-card-zone {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--cyan);
-    }
-    .panel-card-desc {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.6;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.35s ease, margin-top 0.2s;
-    }
-    .panel-card.active .panel-card-desc {
-      max-height: 80px;
-      margin-top: 10px;
-    }
-
-    /* ─── Feature Deep-Dive ──────────────────────────────────────────── */
-    #features {
-      padding: 120px 0;
-      background: var(--bg-2);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      transition: background var(--transition), border-color var(--transition);
-    }
-    .features-header {
-      text-align: center;
-      margin-bottom: 72px;
-    }
-    .features-header p {
-      font-size: 17px;
-      color: var(--muted);
-      max-width: 520px;
-      margin: 0 auto;
-    }
-    .features-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 28px;
-    }
-    .feature-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 40px 36px;
-      position: relative;
-      overflow: hidden;
-      transition: border-color 0.25s, transform 0.2s, background var(--transition);
-    }
-    .feature-card:hover { border-color: rgba(0,240,255,0.28); transform: translateY(-4px); }
-    .feature-card::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .feature-card:hover::after { opacity: 0.6; }
-
-    .feature-anim {
-      width: 100%;
-      height: 180px;
-      border-radius: 10px;
-      background: var(--bg-3);
-      border: 1px solid var(--border);
-      margin-bottom: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Charging animation */
-    .charge-scene {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0;
-      width: 200px;
-    }
-    .charge-pod {
-      width: 100px;
-      height: 28px;
-      background: linear-gradient(135deg, var(--bg-3), #2a3654);
-      border: 1px solid rgba(0,240,255,0.4);
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      animation: chargeFloat 3s ease-in-out infinite;
-      box-shadow: 0 0 16px rgba(0,240,255,0.2);
-      font-family: var(--font-mono);
-      font-size: 9px;
-      color: var(--cyan);
-      letter-spacing: 0.1em;
-    }
-    .charge-pod::before {
-      content: '';
-      position: absolute;
-      bottom: -6px;
-      left: 50%; transform: translateX(-50%);
-      width: 20px; height: 6px;
-      background: rgba(0,240,255,0.5);
-      clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
-    }
-    .charge-gap {
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .charge-dot {
-      width: 4px; height: 4px;
-      border-radius: 50%;
-      background: var(--cyan);
-      animation: chargeDots 1.5s ease-in-out infinite;
-    }
-    .charge-dot:nth-child(2) { animation-delay: 0.2s; }
-    .charge-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes chargeDots {
-      0%, 100% { opacity: 0.2; transform: scale(0.8); }
-      50% { opacity: 1; transform: scale(1.2); }
-    }
-    .charge-pad {
-      width: 130px;
-      height: 20px;
-      background: linear-gradient(135deg, var(--bg-3), #1a2236);
-      border: 1px solid rgba(0,240,255,0.3);
-      border-radius: 8px;
-      box-shadow: 0 0 24px rgba(0,240,255,0.15), 0 4px 16px rgba(0,0,0,0.4);
-      position: relative;
-    }
-    .charge-pad::after {
-      content: '';
-      position: absolute;
-      inset: 3px;
-      border-radius: 5px;
-      background: repeating-linear-gradient(
-        90deg,
-        transparent 0px,
-        transparent 8px,
-        rgba(0,240,255,0.06) 8px,
-        rgba(0,240,255,0.06) 10px
-      );
-    }
-    .charge-beam {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 2px;
-      background: linear-gradient(to bottom, var(--cyan), transparent);
-      animation: chargeBeam 2s ease-in-out infinite;
-    }
-    @keyframes chargeBeam {
-      0%, 100% { height: 0; opacity: 0; }
-      30%, 70% { height: 36px; opacity: 0.7; }
-    }
-    @keyframes chargeFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-12px); }
-    }
-
-    /* Magnetic snap indicator */
-    .magnet-rings {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-    }
-    .magnet-ring {
-      position: absolute;
-      border-radius: 50%;
-      border: 1px solid rgba(0,240,255,0.3);
-      transform: translate(-50%, -50%);
-      animation: magnetRing 2s ease-out infinite;
-    }
-    .magnet-ring:nth-child(1) { width: 24px; height: 24px; animation-delay: 0s; }
-    .magnet-ring:nth-child(2) { width: 44px; height: 44px; animation-delay: 0.35s; }
-    .magnet-ring:nth-child(3) { width: 64px; height: 64px; animation-delay: 0.7s; }
-    @keyframes magnetRing {
-      0% { opacity: 0.8; transform: translate(-50%, -50%) scale(0.6); }
-      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); }
-    }
-
-    /* Wash animation */
-    .wash-scene {
-      width: 120px;
-      height: 120px;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .wash-drum {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      border: 2px solid rgba(0,240,255,0.35);
-      background: radial-gradient(circle, rgba(0,240,255,0.05), transparent);
-      position: relative;
-      overflow: hidden;
-      animation: drumSpin 4s linear infinite;
-    }
-    .wash-drum::before {
-      content: '';
-      position: absolute;
-      inset: 10px;
-      border-radius: 50%;
-      border: 1px dashed rgba(0,240,255,0.2);
-    }
-    .wash-bubble {
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(0,240,255,0.15);
-      animation: bubbleRise linear infinite;
-    }
-    .wash-bubble:nth-child(2) { width: 8px; height: 8px; left: 25%; animation-duration: 2.2s; animation-delay: 0s; }
-    .wash-bubble:nth-child(3) { width: 6px; height: 6px; left: 50%; animation-duration: 1.8s; animation-delay: 0.4s; }
-    .wash-bubble:nth-child(4) { width: 10px; height: 10px; left: 70%; animation-duration: 2.6s; animation-delay: 0.8s; }
-    @keyframes bubbleRise {
-      0% { bottom: -10px; opacity: 0.8; }
-      100% { bottom: 110%; opacity: 0; }
-    }
-    @keyframes drumSpin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .wash-check {
-      position: absolute;
-      font-size: 28px;
-      animation: checkPop 0.5s 0.5s both;
-    }
-    @keyframes checkPop {
-      0% { transform: scale(0); }
-      60% { transform: scale(1.2); }
-      100% { transform: scale(1); }
-    }
-    .wash-label {
-      position: absolute;
-      bottom: 12px;
-      font-family: var(--font-mono);
-      font-size: 9px;
-      color: var(--cyan);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-    }
-
-    .feature-title {
-      font-family: var(--font-head);
-      font-size: 1.4rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-    .feature-desc {
-      font-size: 15px;
-      color: var(--muted);
-      line-height: 1.7;
-      margin-bottom: 24px;
-    }
-    .feature-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .pill {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--cyan);
-      background: var(--cyan-dim);
-      border: 1px solid rgba(0,240,255,0.2);
-      border-radius: 20px;
-      padding: 4px 12px;
-    }
-
-    /* ─── Ecosystem Icons ────────────────────────────────────────────── */
-    .ecosystem {
-      margin-top: 72px;
-      text-align: center;
-    }
-    .eco-title {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 36px;
-    }
-    .eco-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-    }
-    .eco-item {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px 16px;
-      text-align: center;
-      transition: border-color 0.2s, transform 0.15s, background var(--transition);
-    }
-    .eco-item:hover { border-color: rgba(0,240,255,0.28); transform: translateY(-3px); }
-    .eco-icon { font-size: 28px; margin-bottom: 10px; display: block; }
-    .eco-name {
-      font-family: var(--font-head);
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--white);
-      margin-bottom: 4px;
-    }
-    .eco-sub {
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    /* ─── Specs & FAQ ────────────────────────────────────────────────── */
-    #specs {
-      padding: 120px 0;
-      background: var(--bg);
-      transition: background var(--transition);
-    }
-    .specs-inner {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: start;
-    }
-    .specs-table-wrap {
-      overflow: hidden;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-    thead th {
-      background: var(--bg-2);
-      padding: 14px 18px;
-      text-align: left;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--muted);
-      border-bottom: 1px solid var(--border);
-    }
-    tbody tr {
-      border-bottom: 1px solid var(--border);
-      transition: background 0.15s;
-    }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: var(--bg-2); }
-    tbody td {
-      padding: 14px 18px;
-      vertical-align: top;
-    }
-    td:first-child {
-      font-weight: 500;
-      color: var(--muted);
-      width: 42%;
-    }
-    td:last-child { color: var(--white); }
-    td .spec-highlight {
-      color: var(--cyan);
-      font-family: var(--font-mono);
-      font-size: 13px;
-    }
-
-    /* FAQ Accordion */
-    .faq-list { display: flex; flex-direction: column; gap: 2px; }
-    .faq-item {
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      transition: border-color 0.2s, background var(--transition);
-    }
-    .faq-item.open { border-color: rgba(0,240,255,0.2); }
-    .faq-trigger {
-      width: 100%;
-      background: none;
-      border: none;
-      padding: 18px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      cursor: pointer;
-      text-align: left;
-    }
-    .faq-q {
-      font-family: var(--font-head);
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--white);
-    }
-    .faq-chevron {
-      flex-shrink: 0;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: var(--cyan-dim);
-      border: 1px solid rgba(0,240,255,0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.3s, background 0.2s;
-    }
-    .faq-item.open .faq-chevron { transform: rotate(180deg); background: rgba(0,240,255,0.18); }
-    .faq-chevron svg { display: block; }
-    .faq-body {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.38s ease, padding 0.2s;
-    }
-    .faq-item.open .faq-body { max-height: 300px; }
-    .faq-body-inner {
-      padding: 0 20px 18px;
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.7;
-      border-top: 1px solid var(--border);
-      padding-top: 14px;
-    }
-
-    /* ─── Footer ─────────────────────────────────────────────────────── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 48px 0 40px;
-      background: var(--bg-2);
-      transition: background var(--transition), border-color var(--transition);
-    }
-    .footer-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-    .footer-logo {
-      font-family: var(--font-mono);
-      font-size: 13px;
-      color: var(--cyan);
-      letter-spacing: 0.1em;
-    }
-    .footer-links {
-      display: flex;
-      gap: 24px;
-      list-style: none;
-    }
-    .footer-links a {
-      font-size: 13px;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .footer-links a:hover { color: var(--white); }
-    .footer-copy {
-      font-size: 12px;
-      color: var(--muted);
-      width: 100%;
-      text-align: center;
-      margin-top: 24px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
-    }
-
-    /* ─── Animations ─────────────────────────────────────────────────── */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .anim-up { animation: fadeInUp 0.7s ease both; }
-    .anim-up-d1 { animation-delay: 0.1s; }
-    .anim-up-d2 { animation-delay: 0.22s; }
-    .anim-up-d3 { animation-delay: 0.34s; }
-    .anim-up-d4 { animation-delay: 0.46s; }
-
-    /* Intersection Observer fade-in */
-    .reveal {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 0.65s ease, transform 0.65s ease;
-    }
-    .reveal.visible { opacity: 1; transform: none; }
-
-    /* ─── Stealth mode transition overlay ────────────────────────────── */
-    #stealth-flash {
-      position: fixed;
-      inset: 0;
-      background: var(--cyan);
-      opacity: 0;
-      pointer-events: none;
-      z-index: 999;
-      transition: opacity 0.15s;
-    }
-
-    /* ─── Responsive ─────────────────────────────────────────────────── */
-    @media (max-width: 900px) {
-      .how-inner { grid-template-columns: 1fr; gap: 48px; }
-      .how-left { position: static; }
-      .blueprint-stage { max-width: 280px; }
-      .features-grid { grid-template-columns: 1fr; }
-      .specs-inner { grid-template-columns: 1fr; gap: 48px; }
-      .eco-grid { grid-template-columns: repeat(2, 1fr); }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .stat-item:nth-child(2) { border-right: none; }
-      .stat-item:nth-child(3) { border-top: 1px solid var(--border); }
-      .stat-item:nth-child(4) { border-top: 1px solid var(--border); }
-    }
-    @media (max-width: 600px) {
-      .nav-links { display: none; }
-      .eco-grid { grid-template-columns: repeat(2, 1fr); }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .footer-inner { flex-direction: column; align-items: flex-start; }
+      nav { padding: 14px 20px; }
+      .nav-center { display: none; }
+      #hero-title { left: 20px; top: 72px; }
+      #hero-title h1 { font-size: 1.35rem; }
+      #para-area { left: 20px; right: 20px; bottom: 44px; max-width: none; }
+      #spec-strip { display: none; }
+      #rotate-hint { display: none; }
+      #info-panel { width: 100%; }
     }
   </style>
 </head>
 <body>
 
-<!-- Flash overlay for stealth transition -->
-<div id="stealth-flash"></div>
+<!-- ── Canvas ─────────────────────────────────────────────────────── -->
+<canvas id="canvas3d"></canvas>
+<div id="grid-overlay"></div>
 
-<!-- ─── NAV ──────────────────────────────────────────────────────────── -->
+<!-- ── Connector SVG ──────────────────────────────────────────────── -->
+<svg id="conn-svg">
+  <line class="conn-line anim" id="conn-0"/>
+  <line class="conn-line anim" id="conn-1"/>
+  <line class="conn-line anim" id="conn-2"/>
+  <line class="conn-line anim" id="conn-3"/>
+</svg>
+
+<!-- ── Hotspot labels ─────────────────────────────────────────────── -->
+<div class="hs-label" id="hs-0" style="display:none">
+  <div class="hs-label-row"><div class="hs-pin"></div><div class="hs-chip">① ECG Electrodes</div></div>
+</div>
+<div class="hs-label" id="hs-1" style="display:none">
+  <div class="hs-label-row"><div class="hs-pin"></div><div class="hs-chip">② Data Tracks</div></div>
+</div>
+<div class="hs-label" id="hs-2" style="display:none">
+  <div class="hs-label-row"><div class="hs-pin"></div><div class="hs-chip">③ Wrist Display</div></div>
+</div>
+<div class="hs-label" id="hs-3" style="display:none">
+  <div class="hs-label-row"><div class="hs-pin"></div><div class="hs-chip">④ Brain Pod</div></div>
+</div>
+
+<!-- ── Nav ───────────────────────────────────────────────────────── -->
 <nav>
-  <div class="container nav-inner">
-    <a href="#" class="logo">IBWS<span> / SUN-SHIRT</span></a>
-    <ul class="nav-links">
-      <li><a href="#how-it-works">Technology</a></li>
-      <li><a href="#features">Features</a></li>
-      <li><a href="#specs">Specs</a></li>
-    </ul>
-    <button class="btn-stealth" id="stealthToggle">⬡ Toggle Stealth Mode</button>
-  </div>
+  <div class="logo">IBWS<span> / SMART SUN SHIRT</span></div>
+  <div class="nav-center">Gen 1 · Patent Pending · UPF 50+</div>
+  <button class="btn-stealth" id="stealthBtn">⬡ Stealth Mode</button>
 </nav>
 
-<!-- ─── HERO ──────────────────────────────────────────────────────────── -->
-<section id="hero">
-  <!-- Three.js canvas fills the full hero -->
-  <canvas id="canvas3d"></canvas>
+<!-- ── Title ─────────────────────────────────────────────────────── -->
+<div id="hero-title">
+  <div class="badge">Bio-Thermal Wearable System</div>
+  <h1>The Shirt That<br />Feels Like <em>Nothing</em>.<br />Tracks Everything.</h1>
+</div>
 
-  <!-- Text overlay — bottom-left corner -->
-  <div id="hero-overlay">
-    <div class="hero-tag">Integrated Bio-Thermal Wearable System · Gen 1</div>
-    <h1>The Shirt That<br />Feels Like <span class="cyan">Nothing</span>.<br />Tracks Everything.</h1>
-
-    <!-- Cycling dot indicators -->
-    <div class="para-dots" id="paraDots">
-      <div class="para-dot active" data-idx="0"></div>
-      <div class="para-dot" data-idx="1"></div>
-      <div class="para-dot" data-idx="2"></div>
-    </div>
-
-    <!-- Two-paragraph fade block -->
-    <div id="para-block">
-      <p class="para-line">The Smart Sun Shirt integrates phase-change thermoregulation with advanced biometric sensing in a seamless, machine-washable garment.</p>
-      <p class="para-line">Microencapsulated PCM particles embedded in the fabric absorb, store and release heat to buffer your microclimate by up to ±4 °C during intense activity.</p>
-    </div>
-
-    <div class="hero-actions">
-      <button class="btn-primary" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">Explore Technology</button>
-      <a href="#specs" class="btn-outline">View Specs</a>
-    </div>
+<!-- ── Para cycling ───────────────────────────────────────────────── -->
+<div id="para-area">
+  <div class="para-dots">
+    <div class="para-dot on"  data-i="0"></div>
+    <div class="para-dot"     data-i="1"></div>
+    <div class="para-dot"     data-i="2"></div>
   </div>
-
-  <!-- Drag hint top-right -->
-  <div class="drag-hint">⟳ &nbsp;Drag to rotate</div>
-
-  <div class="scroll-hint">
-    <span>Scroll</span>
-    <div class="scroll-line"></div>
-  </div>
-</section>
-
-<!-- ─── STATS BAR ─────────────────────────────────────────────────────── -->
-<div class="stats-bar">
-  <div class="container">
-    <div class="stats-grid">
-      <div class="stat-item reveal">
-        <span class="stat-num">UPF 50+</span>
-        <span class="stat-label">UV Protection</span>
-      </div>
-      <div class="stat-item reveal">
-        <span class="stat-num">36 hr</span>
-        <span class="stat-label">Battery Life (sleep mode)</span>
-      </div>
-      <div class="stat-item reveal">
-        <span class="stat-num">IP68</span>
-        <span class="stat-label">Waterproof Encapsulation</span>
-      </div>
-      <div class="stat-item reveal">
-        <span class="stat-num">±2 bpm</span>
-        <span class="stat-label">ECG Accuracy</span>
-      </div>
-    </div>
+  <div id="para-copy">
+    <p>Phase-change thermoregulation meets medical-grade biometric sensing in a seamless, machine-washable garment.</p>
+    <p>PCM particles buffer your microclimate by ±4 °C. UPF 50+ blocks 98% of UV.</p>
   </div>
 </div>
 
-<!-- ─── HOW IT WORKS ──────────────────────────────────────────────────── -->
-<section id="how-it-works">
-  <div class="container">
-    <div class="how-inner">
+<!-- ── Spec strip ─────────────────────────────────────────────────── -->
+<div id="spec-strip">
+  <div class="spec-row"><span class="spec-val">UPF 50+</span><span class="spec-lbl">UV Protection</span></div>
+  <div class="spec-row"><span class="spec-val">36 hr</span><span class="spec-lbl">Battery Life</span></div>
+  <div class="spec-row"><span class="spec-val">IP68</span><span class="spec-lbl">Waterproof</span></div>
+  <div class="spec-row"><span class="spec-val">±2 bpm</span><span class="spec-lbl">ECG Accuracy</span></div>
+</div>
 
-      <!-- Left: sticky blueprint -->
-      <div class="how-left reveal">
-        <p class="section-label">Interactive Anatomy</p>
-        <h2 class="section-title">Built different.<br /><span class="cyan">At the thread level.</span></h2>
-        <p class="how-desc">
-          Every zone of the IBWS serves a precise function. Hover each hotspot to reveal
-          the technology woven into that part of the garment.
-        </p>
+<!-- ── Rotate hint ────────────────────────────────────────────────── -->
+<div id="rotate-hint">⟳ Drag to rotate</div>
 
-        <div class="blueprint-stage" id="blueprintStage">
-          <!-- Blueprint SVG -->
-          <svg class="blueprint-svg" viewBox="0 0 320 360" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="bpGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#0d1830"/>
-                <stop offset="100%" stop-color="#060c1a"/>
-              </linearGradient>
-              <style>
-                .bp-grid { opacity: 0.35; }
-                .bp-label { font-family: 'Roboto Mono', monospace; font-size: 8px; fill: rgba(0,240,255,0.5); }
-              </style>
-            </defs>
+<!-- ── Info panel ────────────────────────────────────────────────── -->
+<div id="info-panel">
+  <button class="panel-close" id="panelClose">✕</button>
+  <div id="p-num">01</div>
+  <div id="p-zone"></div>
+  <div id="p-title"></div>
+  <div class="panel-divider"></div>
+  <div id="p-body"></div>
+  <div id="p-pills"></div>
+  <div class="panel-hint">Click any label on the shirt to explore ↗</div>
+</div>
 
-            <!-- Background grid -->
-            <g class="bp-grid">
-              <defs>
-                <pattern id="grid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#00F0FF" stroke-width="0.3"/>
-                </pattern>
-              </defs>
-              <rect width="320" height="360" fill="url(#grid)"/>
-            </g>
+<!-- ── GSAP ──────────────────────────────────────────────────────── -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 
-            <!-- Shirt silhouette (blueprint style) -->
-            <path d="
-              M120 28 L80 14 L40 60 L20 120 L60 130 L60 320 L260 320 L260 130 L300 120 L280 60 L240 14 L200 28
-              C185 54 135 54 120 28 Z
-            " fill="url(#bpGrad)" stroke="#00F0FF" stroke-width="1.2" stroke-opacity="0.5"/>
-
-            <!-- Collar -->
-            <path d="M120 28 C135 54 185 54 200 28" fill="none" stroke="#00F0FF" stroke-width="1" stroke-opacity="0.4"/>
-
-            <!-- Dimension lines -->
-            <line x1="18" y1="120" x2="18" y2="320" stroke="rgba(0,240,255,0.2)" stroke-width="0.5"/>
-            <line x1="15" y1="120" x2="21" y2="120" stroke="rgba(0,240,255,0.2)" stroke-width="0.5"/>
-            <line x1="15" y1="320" x2="21" y2="320" stroke="rgba(0,240,255,0.2)" stroke-width="0.5"/>
-
-            <!-- Blueprint annotations -->
-            <text class="bp-label" x="328" y="180" transform="rotate(90,328,180)">CHEST ZONE</text>
-          </svg>
-
-          <!-- Hotspot: Chest (ECG) -->
-          <div class="hotspot" id="hs-ecg" style="left:43%;top:52%;" data-panel="ecg">
-            <div class="hotspot-ring"></div>
-            <div class="hotspot-tooltip" style="left:22px;top:-10px;">
-              <div class="tooltip-zone">Chest Zone</div>
-              <div class="tooltip-title">Medical-Grade ECG</div>
-              <div class="tooltip-desc">Silver-yarn textile electrodes sample your ECG waveform continuously with clinical ±2 bpm accuracy.</div>
-            </div>
-          </div>
-
-          <!-- Hotspot: Sleeve seam -->
-          <div class="hotspot" id="hs-seam" style="left:16%;top:37%;" data-panel="seam">
-            <div class="hotspot-ring"></div>
-            <div class="hotspot-tooltip" style="left:22px;top:-10px;">
-              <div class="tooltip-zone">Sleeve Seams</div>
-              <div class="tooltip-title">Serpentine Data Tracks</div>
-              <div class="tooltip-desc">Stretchable conductive ink traces routed in a serpentine pattern to flex with every arm movement without breaking signal.</div>
-            </div>
-          </div>
-
-          <!-- Hotspot: Wrist cuff display -->
-          <div class="hotspot" id="hs-wrist" style="left:80%;top:70%;" data-panel="wrist">
-            <div class="hotspot-ring"></div>
-            <div class="hotspot-tooltip" style="right:22px;left:auto;top:-10px;">
-              <div class="tooltip-zone">Wrist Cuff</div>
-              <div class="tooltip-title">Stealth Fiber Optic Display</div>
-              <div class="tooltip-desc">Invisible at rest—micro-LEDs behind optical fibers bloom into a monochrome readout only when gesture-activated.</div>
-            </div>
-          </div>
-
-          <!-- Hotspot: Waistband pod -->
-          <div class="hotspot" id="hs-pod" style="left:47%;top:86%;" data-panel="pod">
-            <div class="hotspot-ring"></div>
-            <div class="hotspot-tooltip" style="left:22px;top:auto;bottom:22px;">
-              <div class="tooltip-zone">Waistband</div>
-              <div class="tooltip-title">Flexible Brain Pod</div>
-              <div class="tooltip-desc">An ultra-thin bendable silicone module housing the MCU, BLE radio, and a 36-hour solid-state battery—magnetically detachable before washing.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right: expandable panels -->
-      <div class="reveal">
-        <p class="section-label" style="margin-bottom:24px;">Core Technologies</p>
-        <div class="panel-list" id="panelList">
-
-          <div class="panel-card" id="panel-ecg" data-hotspot="hs-ecg">
-            <div class="panel-card-head">
-              <div class="panel-icon">❤️</div>
-              <div>
-                <div class="panel-card-zone">Chest</div>
-                <div class="panel-card-title">Medical-Grade ECG</div>
-              </div>
-            </div>
-            <div class="panel-card-desc">
-              Textile silver yarns woven directly into the front panel make continuous skin contact. The on-board signal processor filters motion artifact in real time, delivering ECG quality that matches clinical Holter monitors.
-            </div>
-          </div>
-
-          <div class="panel-card" id="panel-seam" data-hotspot="hs-seam">
-            <div class="panel-card-head">
-              <div class="panel-icon">⚡</div>
-              <div>
-                <div class="panel-card-zone">Sleeve Seams</div>
-                <div class="panel-card-title">Serpentine Data Tracks</div>
-              </div>
-            </div>
-            <div class="panel-card-desc">
-              Conductive silver-ink traces printed in a serpentine (S-curve) topology accommodate up to 40% elongation before any resistance change. Data and power travel from chest to wrist without wires or connectors.
-            </div>
-          </div>
-
-          <div class="panel-card" id="panel-wrist" data-hotspot="hs-wrist">
-            <div class="panel-card-head">
-              <div class="panel-icon">💡</div>
-              <div>
-                <div class="panel-card-zone">Wrist Cuff</div>
-                <div class="panel-card-title">Stealth Fiber Optic Display</div>
-              </div>
-            </div>
-            <div class="panel-card-desc">
-              A 16 × 8 micro-LED matrix hidden beneath a polymer diffuser is invisible until activated. A flick-of-the-wrist gesture wakes the display; a second flick dismisses it—average on-time is 2.4 seconds.
-            </div>
-          </div>
-
-          <div class="panel-card" id="panel-pod" data-hotspot="hs-pod">
-            <div class="panel-card-head">
-              <div class="panel-icon">🧠</div>
-              <div>
-                <div class="panel-card-zone">Waistband</div>
-                <div class="panel-card-title">Flexible Brain Pod</div>
-              </div>
-            </div>
-            <div class="panel-card-desc">
-              A 3 mm-thick silicone enclosure houses the ARM Cortex-M33 MCU, BLE 5.3 radio, and a 220 mAh solid-state battery. The pod snaps magnetically onto the shirt's contacts and separates cleanly before the wash cycle.
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── FEATURES ──────────────────────────────────────────────────────── -->
-<section id="features">
-  <div class="container">
-    <div class="features-header reveal">
-      <p class="section-label">The Ecosystem</p>
-      <h2 class="section-title">Designed for the real world.</h2>
-      <p>No fragile connectors. No special cables. No compromises on how you actually live.</p>
-    </div>
-
-    <div class="features-grid">
-
-      <!-- Card 1: Frictionless Charging -->
-      <div class="feature-card reveal">
-        <div class="feature-anim">
-          <div class="charge-scene">
-            <div class="charge-pod">BRAIN POD</div>
-            <div class="charge-gap">
-              <div class="charge-dot"></div>
-              <div class="charge-dot"></div>
-              <div class="charge-dot"></div>
-            </div>
-            <div class="charge-pad" style="position:relative;">
-              <div class="charge-beam" style="height:0; top:auto; bottom:100%; width:40px;"></div>
-            </div>
-          </div>
-          <!-- Magnetic rings under the pad -->
-          <div class="magnet-rings" style="top:72%;left:50%">
-            <div class="magnet-ring"></div>
-            <div class="magnet-ring"></div>
-            <div class="magnet-ring"></div>
-          </div>
-        </div>
-        <h3 class="feature-title">Frictionless Charging</h3>
-        <p class="feature-desc">
-          Pinch the waistband pod off—it takes 0.4 seconds. Drop it on any Qi-compatible
-          pad and you're charging. No ports, no cables, no thought required.
-          Full charge restores in under 90 minutes.
-        </p>
-        <div class="feature-pills">
-          <span class="pill">Qi Wireless</span>
-          <span class="pill">Magnetic Detach</span>
-          <span class="pill">90 min Full Charge</span>
-        </div>
-      </div>
-
-      <!-- Card 2: Machine Washable -->
-      <div class="feature-card reveal">
-        <div class="feature-anim">
-          <div class="wash-scene">
-            <div class="wash-drum">
-              <div class="wash-bubble"></div>
-              <div class="wash-bubble"></div>
-              <div class="wash-bubble"></div>
-              <div class="wash-bubble"></div>
-            </div>
-            <span class="wash-check">✓</span>
-          </div>
-          <span class="wash-label" style="position:absolute;bottom:14px;">Standard wash cycle · 40 °C</span>
-        </div>
-        <h3 class="feature-title">Machine Washable</h3>
-        <p class="feature-desc">
-          Remove the pod. Toss the shirt in. The ECG electrodes, serpentine tracks,
-          fiber optic display and every seam are fully encapsulated to IP68—
-          surviving 100+ wash cycles at 40 °C without signal degradation.
-        </p>
-        <div class="feature-pills">
-          <span class="pill">IP68 Sealed</span>
-          <span class="pill">100+ Wash Cycles</span>
-          <span class="pill">40 °C Safe</span>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Ecosystem icon grid -->
-    <div class="ecosystem reveal">
-      <p class="eco-title">What the system tracks</p>
-      <div class="eco-grid">
-        <div class="eco-item">
-          <span class="eco-icon">❤️</span>
-          <div class="eco-name">Heart Rate</div>
-          <div class="eco-sub">Continuous ECG</div>
-        </div>
-        <div class="eco-item">
-          <span class="eco-icon">🌡️</span>
-          <div class="eco-name">Skin Temp</div>
-          <div class="eco-sub">PCM-integrated</div>
-        </div>
-        <div class="eco-item">
-          <span class="eco-icon">🫁</span>
-          <div class="eco-name">Respiration</div>
-          <div class="eco-sub">Impedance-based</div>
-        </div>
-        <div class="eco-item">
-          <span class="eco-icon">⚡</span>
-          <div class="eco-name">UV Dose</div>
-          <div class="eco-sub">Ambient sensor</div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- ─── SPECS & FAQ ────────────────────────────────────────────────────── -->
-<section id="specs">
-  <div class="container">
-    <div class="reveal" style="text-align:center;margin-bottom:72px;">
-      <p class="section-label">Technical Specification</p>
-      <h2 class="section-title">Every number matters.</h2>
-    </div>
-
-    <div class="specs-inner">
-
-      <!-- Specs table -->
-      <div class="reveal">
-        <div class="specs-table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Parameter</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>UV Protection</td>
-                <td><span class="spec-highlight">UPF 50+</span> — blocks ≥98% UVA/UVB</td>
-              </tr>
-              <tr>
-                <td>Passive Thermal Reg.</td>
-                <td>Microencapsulated PCM fibers, ΔT ±4 °C buffer</td>
-              </tr>
-              <tr>
-                <td>Battery Life</td>
-                <td><span class="spec-highlight">24–36 hr</span> (gesture-sleep mode)</td>
-              </tr>
-              <tr>
-                <td>Waterproofing</td>
-                <td><span class="spec-highlight">IP68</span> · 100% encapsulated</td>
-              </tr>
-              <tr>
-                <td>ECG Accuracy</td>
-                <td><span class="spec-highlight">±2 bpm</span> · Lead I equivalent</td>
-              </tr>
-              <tr>
-                <td>Display</td>
-                <td>16 × 8 micro-LED · fiber optic diffuser</td>
-              </tr>
-              <tr>
-                <td>Wireless</td>
-                <td>BLE 5.3 · range 30 m</td>
-              </tr>
-              <tr>
-                <td>Stretch Tolerance</td>
-                <td>Conductive tracks rated to <span class="spec-highlight">40%</span> elongation</td>
-              </tr>
-              <tr>
-                <td>Pod Dimensions</td>
-                <td>68 × 32 × 3 mm · 14 g</td>
-              </tr>
-              <tr>
-                <td>Fabric</td>
-                <td>87% Recycled Polyester · 13% Elastane</td>
-              </tr>
-              <tr>
-                <td>Wash Rating</td>
-                <td>Machine wash · 40 °C · 100+ cycles</td>
-              </tr>
-              <tr>
-                <td>Certifications</td>
-                <td>CE · FCC · IEC 60601-1 (pending)</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- FAQ accordion -->
-      <div class="reveal">
-        <p class="section-label" style="margin-bottom:20px;">FAQ</p>
-        <div class="faq-list" id="faqList">
-
-          <div class="faq-item">
-            <button class="faq-trigger">
-              <span class="faq-q">How do I wash the shirt?</span>
-              <span class="faq-chevron">
-                <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="#00F0FF" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-              </span>
-            </button>
-            <div class="faq-body">
-              <div class="faq-body-inner">
-                Remove the waistband pod by pinching and pulling—it detaches magnetically in under a second. The rest of the shirt, including all electronics, is fully IP68-sealed and machine-washable up to 40 °C. Simply toss it in like any other athletic shirt.
-              </div>
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-trigger">
-              <span class="faq-q">How accurate is the ECG reading?</span>
-              <span class="faq-chevron">
-                <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="#00F0FF" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-              </span>
-            </button>
-            <div class="faq-body">
-              <div class="faq-body-inner">
-                The textile electrode array captures a Lead I-equivalent ECG at ±2 bpm accuracy. An on-chip motion-artifact rejection algorithm filters noise from movement. The system is not a medical device—it is a wellness monitor and should not replace clinical assessment.
-              </div>
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-trigger">
-              <span class="faq-q">Will the display show through the fabric?</span>
-              <span class="faq-chevron">
-                <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="#00F0FF" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-              </span>
-            </button>
-            <div class="faq-body">
-              <div class="faq-body-inner">
-                No. The wrist cuff display is entirely invisible at rest. The micro-LEDs are shielded behind a polymer diffuser that only becomes transparent when the LEDs are powered. In off state the wrist cuff looks and feels identical to any other performance sleeve.
-              </div>
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-trigger">
-              <span class="faq-q">What does "Stealth Mode" mean?</span>
-              <span class="faq-chevron">
-                <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="#00F0FF" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-              </span>
-            </button>
-            <div class="faq-body">
-              <div class="faq-body-inner">
-                Stealth Mode is a low-power state where all visible indicators turn off. The pod continues sampling biometrics and logging data locally, but the wrist display and BLE broadcast go dark. Battery life extends to 36 hours in this state.
-              </div>
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-trigger">
-              <span class="faq-q">Does the PCM cooling actually work?</span>
-              <span class="faq-chevron">
-                <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="#00F0FF" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-              </span>
-            </button>
-            <div class="faq-body">
-              <div class="faq-body-inner">
-                Phase Change Material microcapsules are embedded in the fiber matrix. At your skin's heat threshold they absorb energy by melting (solid → liquid), buffering your microclimate by up to ±4 °C. The effect lasts roughly 45–90 minutes of intense activity before the PCMs are fully charged and need to re-solidify (typically during rest).
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ─── FOOTER ────────────────────────────────────────────────────────── -->
-<footer>
-  <div class="container">
-    <div class="footer-inner">
-      <div class="footer-logo">IBWS / SUN-SHIRT · GEN 1</div>
-      <ul class="footer-links">
-        <li><a href="#how-it-works">Technology</a></li>
-        <li><a href="#features">Features</a></li>
-        <li><a href="#specs">Specs</a></li>
-      </ul>
-    </div>
-    <div class="footer-copy">
-      © 2026 Integrated Bio-Thermal Wearable Systems. All specifications subject to change. Not a medical device.
-    </div>
-  </div>
-</footer>
-
-<!-- ─── SCRIPTS ────────────────────────────────────────────────────────── -->
-<script>
-  /* ── Stealth Mode Toggle ─────────────────────────────────────────── */
-  const stealthBtn = document.getElementById('stealthToggle');
-  const flash = document.getElementById('stealth-flash');
-  let isStealthMode = false;
-
-  stealthBtn.addEventListener('click', () => {
-    // Flash
-    flash.style.opacity = '0.12';
-    setTimeout(() => { flash.style.opacity = '0'; }, 180);
-
-    isStealthMode = !isStealthMode;
-    document.body.classList.toggle('stealth', isStealthMode);
-    stealthBtn.textContent = isStealthMode ? '◉ Exit Stealth Mode' : '⬡ Toggle Stealth Mode';
-  });
-
-  /* ── Hotspot ↔ Panel sync ───────────────────────────────────────── */
-  const hotspots = document.querySelectorAll('.hotspot');
-  const panels = document.querySelectorAll('.panel-card');
-
-  function activateItem(panelId, hotspotId) {
-    panels.forEach(p => p.classList.remove('active'));
-    hotspots.forEach(h => h.classList.remove('active'));
-    if (panelId) document.getElementById(panelId)?.classList.add('active');
-    if (hotspotId) document.getElementById(hotspotId)?.classList.add('active');
-  }
-
-  hotspots.forEach(hs => {
-    hs.addEventListener('click', () => {
-      const panelId = 'panel-' + hs.dataset.panel;
-      const isActive = hs.classList.contains('active');
-      if (isActive) { activateItem(null, null); return; }
-      activateItem(panelId, hs.id);
-    });
-  });
-
-  panels.forEach(panel => {
-    panel.addEventListener('click', () => {
-      const hsId = panel.dataset.hotspot;
-      const isActive = panel.classList.contains('active');
-      if (isActive) { activateItem(null, null); return; }
-      activateItem(panel.id, hsId);
-    });
-  });
-
-  /* ── FAQ Accordion ──────────────────────────────────────────────── */
-  document.querySelectorAll('.faq-trigger').forEach(trigger => {
-    trigger.addEventListener('click', () => {
-      const item = trigger.closest('.faq-item');
-      const wasOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-      if (!wasOpen) item.classList.add('open');
-    });
-  });
-
-  /* ── Intersection Observer for reveal animations ─────────────────── */
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-  /* ── Charge beam continuous animation hack ─────────────────────── */
-  const beam = document.querySelector('.charge-beam');
-  if (beam) beam.style.animation = 'chargeBeam 2s ease-in-out infinite';
-</script>
-
-<!-- ─── Three.js 3D Shirt ─────────────────────────────────────────────── -->
+<!-- ── Three.js ──────────────────────────────────────────────────── -->
 <script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-  }
-}
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
 </script>
+
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-/* ── Paragraph cycling ──────────────────────────────────────────── */
-const paraSets = [
+/* ── Data ─────────────────────────────────────────────────────────── */
+const HOTSPOTS = [
+  {
+    id: 0,
+    pos3d: [0.02, 0.68, 0.67],
+    labelOffset: [-180, -14],   // px offset: left-offset labels
+    zone: 'Chest Zone', numLabel: '01',
+    title: 'Medical-Grade ECG Electrodes',
+    body: 'Silver-plated conductive yarns are woven directly into the front chest panel, maintaining skin contact during activity. The on-board processor delivers clinical Lead I ECG quality at ±2 bpm — no gel, no strap.',
+    pills: ['Conductive Silver Yarns', '±2 bpm Accuracy', 'Lead I Equivalent', 'Continuous Monitoring'],
+  },
+  {
+    id: 1,
+    pos3d: [-1.36, 0.22, 0.08],
+    labelOffset: [-200, -14],
+    zone: 'Sleeve Seams', numLabel: '02',
+    title: 'Serpentine Data Tracks',
+    body: 'Stretchable silver-ink traces printed in an S-curve pattern route both data and power from the chest ECG array to the wrist display. The serpentine geometry tolerates 40% elongation without resistance change.',
+    pills: ['40% Stretch Rating', 'Conductive Ink', 'Zero Connectors', 'Power + Data'],
+  },
+  {
+    id: 2,
+    pos3d: [1.58, -0.58, 0.08],
+    labelOffset: [18, -14],
+    zone: 'Wrist Cuff', numLabel: '03',
+    title: 'Stealth Fiber Optic Display',
+    body: 'A 16×8 micro-LED matrix behind a polymer diffuser is completely invisible at rest. A wrist-flick gesture activates the monochrome readout showing heart rate, skin temperature and UV dose. Average on-time: 2.4 seconds.',
+    pills: ['16×8 micro-LED', 'Gesture Wake', 'Invisible at Rest', '2.4 s Avg On-Time'],
+  },
+  {
+    id: 3,
+    pos3d: [0.0, -1.18, 0.40],
+    labelOffset: [-100, 24],
+    zone: 'Waistband', numLabel: '04',
+    title: 'Modular Brain Pod',
+    body: 'A 3 mm silicone capsule containing the ARM Cortex-M33 MCU, BLE 5.3 radio, and 220 mAh solid-state battery. Snaps magnetically onto pogo contacts. Detaches in under a second before the shirt goes in the wash.',
+    pills: ['ARM Cortex-M33', 'BLE 5.3', '36 hr Battery', 'Magnetic Detach', 'Qi Wireless Charge'],
+  },
+];
+
+const PARA_SETS = [
   [
-    "The Smart Sun Shirt integrates phase-change thermoregulation with advanced biometric sensing in a seamless, machine-washable garment.",
-    "Microencapsulated PCM particles embedded in the fabric absorb, store and release heat to buffer your microclimate by up to ±4 °C during intense activity."
+    'Phase-change thermoregulation meets medical-grade biometric sensing in a seamless, machine-washable garment.',
+    'PCM particles buffer your microclimate by ±4 °C. UPF 50+ blocks 98% of UV.',
   ],
   [
-    "Silver-plated conductive yarns woven directly into the chest panel continuously track your ECG at ±2 bpm clinical accuracy — no chest strap needed.",
-    "Stretchable silver-ink traces routed in a serpentine pattern along both sleeve seams carry data and power from chest to wrist, tolerating 40% elongation without degradation."
+    'Silver-plated conductive yarns in the chest deliver continuous ECG at ±2 bpm clinical accuracy — without a chest strap.',
+    'Serpentine ink tracks flex up to 40% and carry power and data from torso to wrist with zero signal loss.',
   ],
   [
-    "The wrist cuff display is invisible at rest — a quick flick activates a fiber optic matrix revealing heart rate, temperature and UV index in monochrome.",
-    "The 3 mm modular Brain Pod clips magnetically to the waistband and detaches in under a second. Remove it, toss the shirt in the wash at 40 °C, reattach after."
+    'The wrist cuff display is invisible at rest. A quick wrist flick reveals your real-time biometrics in glowing monochrome.',
+    'Pinch the Brain Pod free in under a second, charge it wirelessly, then machine-wash the entire shirt at 40 °C.',
   ],
 ];
 
-let currentPara = 0;
-const paraBlock = document.getElementById('para-block');
+/* ── Paragraph cycling ─────────────────────────────────────────── */
+let curP = 0;
+const paraCopy = document.getElementById('para-copy');
 const paraDots = document.querySelectorAll('.para-dot');
 
-function showParaSet(idx) {
-  paraBlock.style.opacity = '0';
-  setTimeout(() => {
-    const [a, b] = paraSets[idx];
-    paraBlock.innerHTML = `<p class="para-line">${a}</p><p class="para-line">${b}</p>`;
-    paraBlock.style.opacity = '1';
-    paraDots.forEach((d, i) => d.classList.toggle('active', i === idx));
-  }, 500);
+function showPara(i) {
+  gsap.to(paraCopy, { opacity: 0, duration: 0.3, onComplete: () => {
+    paraCopy.innerHTML = PARA_SETS[i].map(t => `<p>${t}</p>`).join('');
+    gsap.to(paraCopy, { opacity: 1, duration: 0.4 });
+    paraDots.forEach((d, j) => d.classList.toggle('on', j === i));
+  }});
 }
-
-paraDots.forEach(dot => {
-  dot.addEventListener('click', () => {
-    currentPara = parseInt(dot.dataset.idx);
-    showParaSet(currentPara);
-    resetCycleTimer();
-  });
-});
-
-let cycleTimer;
-function resetCycleTimer() {
-  clearInterval(cycleTimer);
-  cycleTimer = setInterval(() => {
-    currentPara = (currentPara + 1) % paraSets.length;
-    showParaSet(currentPara);
-  }, 5500);
+paraDots.forEach(d => d.addEventListener('click', () => {
+  curP = +d.dataset.i; showPara(curP); resetCycle();
+}));
+let cycleInt;
+function resetCycle() {
+  clearInterval(cycleInt);
+  cycleInt = setInterval(() => { curP = (curP + 1) % 3; showPara(curP); }, 5500);
 }
-resetCycleTimer();
+resetCycle();
 
-/* ── Renderer & Scene ───────────────────────────────────────────── */
+/* ── Renderer ──────────────────────────────────────────────────── */
 const canvas = document.getElementById('canvas3d');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.15;
+renderer.toneMappingExposure = 1.18;
 renderer.setClearColor(0x000000, 0);
 
 const scene = new THREE.Scene();
-
-const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
-camera.position.set(0, 0.4, 5.0);
-camera.lookAt(0, 0.15, 0);
+const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+camera.position.set(0, 0.4, 5.3);
 
 function resize() {
-  const w = canvas.clientWidth, h = canvas.clientHeight;
+  const w = window.innerWidth, h = window.innerHeight;
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
 }
 window.addEventListener('resize', resize);
+resize();
 
-/* ── Controls ───────────────────────────────────────────────────── */
+/* ── Controls ──────────────────────────────────────────────────── */
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-controls.dampingFactor = 0.07;
+controls.dampingFactor = 0.06;
 controls.autoRotate = true;
-controls.autoRotateSpeed = 0.7;
+controls.autoRotateSpeed = 0.55;
 controls.enablePan = false;
 controls.minDistance = 2.8;
-controls.maxDistance = 8;
-controls.maxPolarAngle = Math.PI * 0.82;
-controls.minPolarAngle = Math.PI * 0.18;
-controls.target.set(0, 0.15, 0);
+controls.maxDistance = 9.5;
+controls.maxPolarAngle = Math.PI * 0.80;
+controls.minPolarAngle = Math.PI * 0.20;
+controls.target.set(0, 0.1, 0);
 
-let autoRotateTimer;
-controls.addEventListener('start', () => { controls.autoRotate = false; clearTimeout(autoRotateTimer); });
-controls.addEventListener('end', () => {
-  autoRotateTimer = setTimeout(() => { controls.autoRotate = true; }, 2200);
-});
+let autoTimer;
+controls.addEventListener('start', () => { controls.autoRotate = false; clearTimeout(autoTimer); });
+controls.addEventListener('end',  () => { autoTimer = setTimeout(() => { controls.autoRotate = true; }, 2500); });
 
-/* ── Lighting ───────────────────────────────────────────────────── */
-scene.add(new THREE.AmbientLight(0xb8ccee, 0.55));
+/* ── Lighting ──────────────────────────────────────────────────── */
+scene.add(new THREE.AmbientLight(0xb0c6e2, 0.62));
 
-const key = new THREE.DirectionalLight(0xffffff, 2.0);
-key.position.set(3, 5, 5);
-key.castShadow = true;
+const key = new THREE.DirectionalLight(0xffffff, 2.4);
+key.position.set(3, 5, 5); key.castShadow = true;
 scene.add(key);
 
-const fill = new THREE.DirectionalLight(0x88aadd, 0.5);
-fill.position.set(-4, 1, 3);
+const fill = new THREE.DirectionalLight(0x90aadd, 0.55);
+fill.position.set(-4, 2, 3);
 scene.add(fill);
 
-const rim = new THREE.DirectionalLight(0x00c8dd, 0.35);
-rim.position.set(0, -2, -4);
+const rim = new THREE.DirectionalLight(0x00ddf2, 0.5);
+rim.position.set(0, -1, -4);
 scene.add(rim);
 
-const top = new THREE.DirectionalLight(0xddeeff, 0.3);
-top.position.set(0, 6, 0);
-scene.add(top);
+scene.add(Object.assign(new THREE.DirectionalLight(0xddeeff, 0.35), { position: new THREE.Vector3(0, 7, 1) }));
 
-/* ── Shirt Material ─────────────────────────────────────────────── */
+/* ── Shirt material ────────────────────────────────────────────── */
 const shirtMat = new THREE.MeshStandardMaterial({
-  color: 0xccdae8,
-  roughness: 0.74,
-  metalness: 0.03,
+  color: 0xd2e0ec,
+  roughness: 0.76,
+  metalness: 0.025,
 });
 
-/* ── Torso — LatheGeometry profile ─────────────────────────────── */
-const profile = [
-  new THREE.Vector2(0.50, -1.40),
-  new THREE.Vector2(0.54, -1.05),
-  new THREE.Vector2(0.58, -0.55),
-  new THREE.Vector2(0.62,  0.00),
-  new THREE.Vector2(0.65,  0.40),
-  new THREE.Vector2(0.68,  0.72),
-  new THREE.Vector2(0.70,  0.94),
-  new THREE.Vector2(0.60,  1.07),
-  new THREE.Vector2(0.24,  1.20),
-  new THREE.Vector2(0.19,  1.34),
-  new THREE.Vector2(0.18,  1.46),
+/* ── Torso (LatheGeometry + oval squish) ───────────────────────── */
+const profilePts = [
+  new THREE.Vector2(0.47, -1.44),
+  new THREE.Vector2(0.51, -1.10),
+  new THREE.Vector2(0.56, -0.60),
+  new THREE.Vector2(0.61,  0.00),
+  new THREE.Vector2(0.64,  0.40),
+  new THREE.Vector2(0.67,  0.72),
+  new THREE.Vector2(0.70,  0.97),
+  new THREE.Vector2(0.58,  1.10),
+  new THREE.Vector2(0.22,  1.24),
+  new THREE.Vector2(0.19,  1.38),
+  new THREE.Vector2(0.18,  1.50),
 ];
-const torsoGeo = new THREE.LatheGeometry(profile, 52);
-
-// Flatten front-to-back (oval cross-section like a real torso)
-const tPos = torsoGeo.attributes.position;
-for (let i = 0; i < tPos.count; i++) {
-  tPos.setZ(i, tPos.getZ(i) * 0.70);
-}
+const torsoGeo = new THREE.LatheGeometry(profilePts, 60);
+const tp = torsoGeo.attributes.position;
+for (let i = 0; i < tp.count; i++) tp.setZ(i, tp.getZ(i) * 0.67);
 torsoGeo.computeVertexNormals();
 const torso = new THREE.Mesh(torsoGeo, shirtMat);
 torso.castShadow = true;
 
-/* ── Sleeves ────────────────────────────────────────────────────── */
-const armGeo = new THREE.CylinderGeometry(0.20, 0.135, 2.15, 22);
+/* ── Sleeves ───────────────────────────────────────────────────── */
+function makeArm(side) {
+  const g = new THREE.CylinderGeometry(0.207, 0.138, 2.22, 24);
+  const m = new THREE.Mesh(g, shirtMat);
+  m.position.set(side * 1.03, 0.27, 0);
+  m.rotation.z = side * -0.33;
+  m.rotation.x = 0.10;
+  m.castShadow = true;
+  return m;
+}
 
-const leftArm = new THREE.Mesh(armGeo, shirtMat);
-leftArm.position.set(-1.00, 0.28, 0);
-leftArm.rotation.z =  0.34;
-leftArm.rotation.x =  0.12;
-leftArm.castShadow = true;
-
-const rightArm = new THREE.Mesh(armGeo, shirtMat);
-rightArm.position.set( 1.00, 0.28, 0);
-rightArm.rotation.z = -0.34;
-rightArm.rotation.x =  0.12;
-rightArm.castShadow = true;
-
-/* ── Collar ─────────────────────────────────────────────────────── */
-const collarGeo = new THREE.TorusGeometry(0.19, 0.05, 12, 48);
-const collar = new THREE.Mesh(collarGeo, shirtMat);
-collar.position.set(0, 1.32, 0);
+/* ── Collar ────────────────────────────────────────────────────── */
+const collar = new THREE.Mesh(
+  new THREE.TorusGeometry(0.19, 0.053, 14, 56),
+  shirtMat
+);
+collar.position.set(0, 1.36, 0);
 collar.rotation.x = Math.PI / 2;
 
-/* ── Shirt group ────────────────────────────────────────────────── */
+/* ── Group ─────────────────────────────────────────────────────── */
 const shirt = new THREE.Group();
-shirt.add(torso, leftArm, rightArm, collar);
-shirt.position.y = -0.18;
+shirt.add(torso, makeArm(-1), makeArm(1), collar);
+shirt.position.y = -0.2;
 scene.add(shirt);
 
-/* ── Subtle shadow disc ─────────────────────────────────────────── */
-const discGeo = new THREE.CircleGeometry(1.3, 40);
-const discMat = new THREE.MeshBasicMaterial({ color: 0x00F0FF, transparent: true, opacity: 0.03, side: THREE.DoubleSide });
-const disc = new THREE.Mesh(discGeo, discMat);
-disc.rotation.x = -Math.PI / 2;
-disc.position.y = -1.62;
-scene.add(disc);
-
-/* ── Hotspot spheres ────────────────────────────────────────────── */
-// Positions in shirt group's local space
-const hotspotDefs = [
-  { pos: [ 0.00,  0.70,  0.66] },   // chest ECG
-  { pos: [-1.35,  0.20,  0.10] },   // left sleeve seam
-  { pos: [ 1.56, -0.60,  0.08] },   // right wrist display
-  { pos: [ 0.00, -1.20,  0.38] },   // waistband pod
-];
-
-const dotMat   = new THREE.MeshBasicMaterial({ color: 0x00F0FF });
-const glowMat  = new THREE.MeshBasicMaterial({ color: 0x00F0FF, transparent: true, opacity: 0.13 });
-const hotspots = [];
-
-hotspotDefs.forEach(({ pos }) => {
-  const dot  = new THREE.Mesh(new THREE.SphereGeometry(0.055, 14, 14), dotMat.clone());
-  const glow = new THREE.Mesh(new THREE.SphereGeometry(0.130, 14, 14), glowMat.clone());
-  const light = new THREE.PointLight(0x00F0FF, 1.0, 0.65);
-  dot.position.set(...pos);
-  glow.position.set(...pos);
-  light.position.set(...pos);
-  shirt.add(dot, glow, light);
-  hotspots.push({ dot, glow, light });
-});
-
-/* ── ECG line on chest ──────────────────────────────────────────── */
+/* ── ECG line ──────────────────────────────────────────────────── */
 const ecgPts = [];
 for (let i = 0; i < 64; i++) {
   const t = i / 63;
-  const x = -0.24 + t * 0.48;
-  let   y =  0.70;
-  if (i === 20) y += 0.025;
-  if (i === 22) y += 0.130;
-  if (i === 23) y -= 0.190;
-  if (i === 24) y += 0.110;
-  if (i === 25) y += 0.020;
-  if (i === 36 || i === 37) y += 0.030;
-  ecgPts.push(new THREE.Vector3(x, y, 0.66));
+  let y = 0.70;
+  if (i===20) y+=0.03; if (i===22) y+=0.135;
+  if (i===23) y-=0.20; if (i===24) y+=0.12;
+  if (i===25) y+=0.025; if (i===36||i===37) y+=0.034;
+  ecgPts.push(new THREE.Vector3(-0.26 + t * 0.52, y, 0.67));
 }
-const ecgGeo = new THREE.BufferGeometry().setFromPoints(ecgPts);
-const ecgMat = new THREE.LineBasicMaterial({ color: 0x00F0FF, transparent: true, opacity: 0.75 });
-const ecgLine = new THREE.Line(ecgGeo, ecgMat);
-shirt.add(ecgLine);
+const ecgMat = new THREE.LineBasicMaterial({ color: 0x00F0FF, transparent: true, opacity: 0.82 });
+shirt.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(ecgPts), ecgMat));
 
-/* ── Wrist display — tiny glowing rectangle on right cuff ──────── */
-const wristGeo = new THREE.PlaneGeometry(0.18, 0.10);
-const wristMat = new THREE.MeshBasicMaterial({ color: 0x00F0FF, transparent: true, opacity: 0.55, side: THREE.DoubleSide });
-const wristDisplay = new THREE.Mesh(wristGeo, wristMat);
-wristDisplay.position.set(1.56, -0.60, 0.14);
-wristDisplay.rotation.y = -0.34;
-shirt.add(wristDisplay);
+/* ── Wrist display ─────────────────────────────────────────────── */
+const wristMat = new THREE.MeshBasicMaterial({ color: 0x00F0FF, transparent: true, opacity: 0.5, side: THREE.DoubleSide });
+const wrist = new THREE.Mesh(new THREE.PlaneGeometry(0.19, 0.11), wristMat);
+wrist.position.set(1.58, -0.58, 0.15);
+wrist.rotation.y = -0.33;
+shirt.add(wrist);
 
-/* ── Stealth mode hook ──────────────────────────────────────────── */
-const stealthBtn = document.getElementById('stealthToggle');
-let stealthOn = false;
-stealthBtn.addEventListener('click', () => {
-  stealthOn = !stealthOn;
-  shirtMat.color.set(stealthOn ? 0x0d1e32 : 0xccdae8);
-  shirtMat.emissive.set(stealthOn ? 0x001822 : 0x000000);
-  scene.background = null;
+/* ── Hotspot objects ───────────────────────────────────────────── */
+const dotMat  = new THREE.MeshBasicMaterial({ color: 0x00F0FF });
+const glowMat = new THREE.MeshBasicMaterial({ color: 0x00F0FF, transparent: true, opacity: 0.12 });
+
+const hsObjs = HOTSPOTS.map(h => {
+  const dot   = new THREE.Mesh(new THREE.SphereGeometry(0.055, 14, 14), dotMat.clone());
+  const glow  = new THREE.Mesh(new THREE.SphereGeometry(0.130, 14, 14), glowMat.clone());
+  const light = new THREE.PointLight(0x00F0FF, 0.85, 0.65);
+  [dot, glow, light].forEach(o => o.position.set(...h.pos3d));
+  shirt.add(dot, glow, light);
+  return { dot, glow, light };
 });
 
-/* ── Animate loop ───────────────────────────────────────────────── */
+/* ── Shadow disc ───────────────────────────────────────────────── */
+const discMesh = new THREE.Mesh(
+  new THREE.CircleGeometry(1.35, 44),
+  new THREE.MeshBasicMaterial({ color: 0x00F0FF, transparent: true, opacity: 0.025, side: THREE.DoubleSide })
+);
+discMesh.rotation.x = -Math.PI / 2;
+discMesh.position.y = -1.68;
+scene.add(discMesh);
+
+/* ── Label projection helpers ──────────────────────────────────── */
+const hsLabels = HOTSPOTS.map(h => document.getElementById(`hs-${h.id}`));
+const connEls  = HOTSPOTS.map((_, i) => document.getElementById(`conn-${i}`));
+const tmpV3 = new THREE.Vector3();
+
+function project(pos3d) {
+  tmpV3.set(...pos3d).applyMatrix4(shirt.matrixWorld).project(camera);
+  return {
+    x: ( tmpV3.x * 0.5 + 0.5) * window.innerWidth,
+    y: (-tmpV3.y * 0.5 + 0.5) * window.innerHeight,
+    behind: tmpV3.z > 1,
+  };
+}
+
+function updateLabels() {
+  HOTSPOTS.forEach((hs, i) => {
+    const { x, y, behind } = project(hs.pos3d);
+    const label = hsLabels[i];
+    const conn  = connEls[i];
+    if (behind) { label.style.display = 'none'; conn.style.display = 'none'; return; }
+    label.style.display = '';
+    conn.style.display  = '';
+    const lx = x + hs.labelOffset[0];
+    const ly = y + hs.labelOffset[1];
+    label.style.left = lx + 'px';
+    label.style.top  = ly + 'px';
+    // Connector: from 3D-projected dot → label pin dot
+    const pin = label.querySelector('.hs-pin');
+    const pinX = lx + pin.offsetWidth / 2;
+    const pinY = ly + pin.offsetHeight / 2;
+    conn.setAttribute('x1', x);  conn.setAttribute('y1', y);
+    conn.setAttribute('x2', pinX); conn.setAttribute('y2', pinY);
+  });
+}
+
+/* ── Info panel ────────────────────────────────────────────────── */
+gsap.set('#info-panel', { xPercent: 100 });
+let panelOpen = false;
+
+function openPanel(hs) {
+  document.getElementById('p-num').textContent   = hs.numLabel;
+  document.getElementById('p-zone').textContent  = hs.zone;
+  document.getElementById('p-title').textContent = hs.title;
+  document.getElementById('p-body').textContent  = hs.body;
+  document.getElementById('p-pills').innerHTML   = hs.pills.map(p => `<span class="ppill">${p}</span>`).join('');
+  gsap.to('#info-panel', { xPercent: 0, duration: 0.6, ease: 'power3.out' });
+  // Gentle camera shift toward the hotspot
+  gsap.to(controls.target, {
+    x: hs.pos3d[0] * 0.22,
+    y: hs.pos3d[1] * 0.14 + 0.1,
+    duration: 0.9, ease: 'power2.inOut',
+    onUpdate: () => controls.update(),
+  });
+  panelOpen = true;
+}
+
+function closePanel() {
+  gsap.to('#info-panel', { xPercent: 100, duration: 0.45, ease: 'power3.in' });
+  gsap.to(controls.target, {
+    x: 0, y: 0.1, duration: 0.7, ease: 'power2.inOut',
+    onUpdate: () => controls.update(),
+  });
+  panelOpen = false;
+}
+
+document.getElementById('panelClose').addEventListener('click', closePanel);
+hsLabels.forEach((el, i) => el.addEventListener('click', () => openPanel(HOTSPOTS[i])));
+
+/* ── Raycasting — click on 3D dots too ────────────────────────── */
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+canvas.addEventListener('click', e => {
+  mouse.x =  (e.clientX / window.innerWidth)  * 2 - 1;
+  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(hsObjs.map(h => h.dot));
+  if (hits.length) {
+    const idx = hsObjs.findIndex(h => h.dot === hits[0].object);
+    if (idx >= 0) openPanel(HOTSPOTS[idx]);
+  }
+});
+
+/* ── Stealth mode ──────────────────────────────────────────────── */
+let stealthOn = false;
+document.getElementById('stealthBtn').addEventListener('click', () => {
+  stealthOn = !stealthOn;
+  document.body.classList.toggle('stealth', stealthOn);
+  const tc = stealthOn ? { r: 0.05, g: 0.10, b: 0.19 } : { r: 0.82, g: 0.88, b: 0.93 };
+  gsap.to(shirtMat.color, { ...tc, duration: 0.75, ease: 'power2.inOut' });
+  document.getElementById('stealthBtn').textContent = stealthOn ? '◉ Exit Stealth' : '⬡ Stealth Mode';
+});
+
+/* ── Animation loop ────────────────────────────────────────────── */
 let t = 0;
 function animate() {
   requestAnimationFrame(animate);
   t += 0.016;
 
-  // Pulse hotspots
-  hotspots.forEach(({ glow, light }, i) => {
-    const p = 0.5 + 0.5 * Math.sin(t * 2.6 + i * 1.55);
-    glow.material.opacity = 0.06 + p * 0.18;
-    glow.scale.setScalar(0.85 + p * 0.38);
-    light.intensity = 0.6 + p * 0.9;
+  hsObjs.forEach(({ glow, light }, i) => {
+    const p = 0.5 + 0.5 * Math.sin(t * 2.5 + i * 1.57);
+    glow.material.opacity = 0.06 + p * 0.19;
+    glow.scale.setScalar(0.78 + p * 0.48);
+    light.intensity = 0.45 + p * 1.1;
   });
 
-  // ECG opacity pulse
-  ecgMat.opacity = 0.25 + 0.55 * Math.abs(Math.sin(t * 1.4));
-
-  // Wrist display flicker
-  wristMat.opacity = stealthOn ? (0.4 + 0.4 * Math.abs(Math.sin(t * 3.0))) : (0.3 + 0.3 * Math.abs(Math.sin(t * 1.8)));
+  ecgMat.opacity = 0.22 + 0.65 * Math.abs(Math.sin(t * 1.4));
+  wristMat.opacity = stealthOn
+    ? 0.45 + 0.45 * Math.abs(Math.sin(t * 3.2))
+    : 0.28 + 0.28 * Math.abs(Math.sin(t * 1.9));
 
   controls.update();
   renderer.render(scene, camera);
+  updateLabels();
 }
 
-resize();
 animate();
 </script>
 </body>
